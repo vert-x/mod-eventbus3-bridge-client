@@ -1,0 +1,9 @@
+{
+  "description": "Module to bridge vert.x2 eventbus to vert.x3 eventbus",
+  "licenses": ["The Apache Software License Version 2.0"],
+  "author": "Paulo Lopes <plopes@redhat.com>",
+
+  "developers": ["pmlopes"],
+  "keywords": ["vertx3", "eventbus"],
+  "homepage": "https://github.com/vert-x/mod-eventbus3-client"
+}
