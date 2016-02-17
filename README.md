@@ -269,5 +269,5 @@ Register a consumer for messages addressed to `reply2` and once a message is rec
 
 For complete source code examples refer to:
 
-* [examples/vertx2/EventBus3BridgeClientVerticle.java](examples/vertx2/EventBus3BridgeClientVerticle.java)
-* [examples/vertx3/TcpEventBusBridgePingPongServer.java](examples/vertx3/TcpEventBusBridgePingPongServer.java)
+* [example/vertx2/EventBus3BridgeClientVerticle.java](example/vertx2/EventBus3BridgeClientVerticle.java)
+* [example/vertx3/TcpEventBusBridgePingPongServer.java](example/vertx3/TcpEventBusBridgePingPongServer.java)
