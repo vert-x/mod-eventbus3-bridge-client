@@ -42,7 +42,7 @@ The full list os configuration properties are:
 | reconnectInterval |           |               |                                                  |
 | connectionTimeout |           |               |                                                  |
 | pingInterval      |           | 5000          |                                                  |
-| defaultHeaders    |           |               | a json object                                    |
+| defaultHeaders    |           | {}            | a json object                                    |
 
 And and example would be:
 
@@ -71,7 +71,7 @@ The client and bridge allow this communication no matter which side the messages
 
 ### Send from vert.x3 to vert.x2
 
-Vert.x3 code:
+#### Vert.x3 code:
 
 ```java
 public class Example {
@@ -93,7 +93,10 @@ public class Example {
 }
 ```
 
-Vert.x2 (this module) code:
+In this example a bridge is created allowing any messages in and out of the eventbus. The bridge will accept TCP connections on port 7000 and once it is ready it will send a message to address `send3` with the payload `{msg: "hello send"}`.
+
+
+#### Vert.x2 (this module) code:
 
 ```java
 public class Example extends Verticle {
@@ -123,18 +126,25 @@ public class Example extends Verticle {
 }
 ```
 
+This verticle starts by creating a connection to an existing bridge using the container config options (see above for what configurations are possible) and once the TCP connection is established, registers an handler on address `send3`. Once a message is received at that address it will be printed on the console.
+
+To handle any error an exception handler is also set up and will print the stack trace of the error.
+
+
 ### Publish from vert.x3 to vert.x2
 
 For simplicity the configuration is ommited since it is the same as the previous example.
 
-Vert.x3 code:
+#### Vert.x3 code:
 
 ```java
 eb.publish("publish3", new JsonObject().put("msg", "hello publish"));
-
 ```
 
-Vert.x2 (this module) code:
+This will publish (send one message to all registered addresses).
+
+
+#### Vert.x2 (this module) code:
 
 ```java
 eb.registerHandler("publish3", new Handler<BridgeMessage>() {
@@ -152,9 +162,12 @@ eb.registerHandler("publish3", new Handler<BridgeMessage>() {
 });
 ```
 
+This code registers 2 handlers on the same address (`publish3`) so when a publish command is sent from Vert.x3 it will be received by both handlers.
+
+
 ### Send Reply from vert.x3 to vert.x2
 
-Vert.x3 code:
+#### Vert.x3 code:
 
 ```java
 eb.send("reply3", new JsonObject().put("msg", "ping"), msg -> {
@@ -162,7 +175,10 @@ eb.send("reply3", new JsonObject().put("msg", "ping"), msg -> {
 });
 ```
 
-Vert.x2 (this module) code:
+Send a message and when a reply is received the reply is printed to the standard output.
+
+
+#### Vert.x2 (this module) code:
 
 ```java
 eb.registerHandler("reply3", new Handler<BridgeMessage>() {
@@ -174,15 +190,21 @@ eb.registerHandler("reply3", new Handler<BridgeMessage>() {
 });
 ```
 
+Set up a handler to receive a a message to address `reply3` and reply back with `{msg: "pong"}`.
+
+
 ### Send from vert.x2 to vert.x3
 
-Vert.x2 (this module) code:
+#### Vert.x2 (this module) code:
 
 ```java
 eb.send("send2", new JsonObject().putString("msg", "hello send"));
 ```
 
-Vert.x3 code:
+Send a message from Vert.x2 to an address on Vert.x3.
+
+
+#### Vert.x3 code:
 
 ```java
 eb.consumer("send2", msg -> {
@@ -190,15 +212,20 @@ eb.consumer("send2", msg -> {
 });
 ```
 
+Once a message is received on Vert.x3 print out its body.
+
+
 ### Publish from vert.x2 to vert.x3
 
-Vert.x2 (this module) code:
+#### Vert.x2 (this module) code:
 
 ```java
 eb.publish("publish2", new JsonObject().putString("msg", "hello publish"));
 ```
 
-Vert.x3 code:
+Send one to many messages.
+
+#### Vert.x3 code:
 
 ```java
 eb.consumer("publish2", msg -> {
@@ -210,9 +237,12 @@ eb.consumer("publish2", msg -> {
 });
 ```
 
+In this example register 2 handlers on the same address so once a message is published to the address `publish2` then both handlers will print out its body.
+
+
 ### Send Reply from vert.x2 to vert.x3
 
-Vert.x2 (this module) code:
+#### Vert.x2 (this module) code:
 
 ```java
 eb.send("reply2", new JsonObject().putString("msg", "ping"), new Handler<BridgeMessage>() {
@@ -223,7 +253,9 @@ eb.send("reply2", new JsonObject().putString("msg", "ping"), new Handler<BridgeM
 });
 ```
 
-Vert.x3 code:
+Send a message to Vert.x3 and once a reply is received print out the reply body.
+
+#### Vert.x3 code:
 
 ```java
 eb.consumer("reply2", msg -> {
@@ -231,6 +263,9 @@ eb.consumer("reply2", msg -> {
   msg.reply(new JsonObject().put("msg", "pong"));
 });
 ```
+
+Register a consumer for messages addressed to `reply2` and once a message is received reply back with the message `{msg: "pong"}`.
+
 
 For complete source code examples refer to:
 
