@@ -135,11 +135,15 @@ public class EventBus3 {
         socket.dataHandler(new Handler<Buffer>() {
 
           private Buffer buffer = new Buffer(0);
+          private Boolean hasDataAvailable (final Buffer buf){
+        	  return (buffer.length() > 4) &&
+        		       (buffer.length() >= buffer.getInt(0) + 4);
+          }
 
           @Override
           public void handle(final Buffer buf) {
             buffer.appendBuffer(buf);
-            while (buffer.length() > 4) {
+            while (hasDataAvailable(buffer)) {
               int len = buffer.getInt(0);
               if (buffer.length() >= len + 4) {
                 String message = buffer.getString(4, 4 + len);
